@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: aiprovider-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: aiprovider
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aiprovider-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - HK_BACKEND_URL=http://backend-hk:8001
+    depends_on:
+      - mongodb
+      - backend-hk
+    volumes:
+      - uploads_data:/app/uploads
+
+  backend-hk:
+    build:
+      context: ./backend-hk
+      dockerfile: Dockerfile
+    container_name: aiprovider-backend-hk
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - generated_data:/app/generated
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aiprovider-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  uploads_data:
+  generated_data:

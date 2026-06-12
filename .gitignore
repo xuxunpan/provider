@@ -1,0 +1,43 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MongoDB
+data/db/
+
+# Uploads & generated
+uploads/*
+!uploads/.gitkeep
+generated/*
+!generated/.gitkeep
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
