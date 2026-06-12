@@ -9,13 +9,23 @@ from ..config import get_settings
 settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# bcrypt 密码长度上限为 72 字节
+BCRYPT_MAX_PASSWORD_BYTES = 72
+
+
+def _truncate_password(password: str) -> str:
+    password_bytes = password.encode("utf-8")
+    if len(password_bytes) > BCRYPT_MAX_PASSWORD_BYTES:
+        return password_bytes[:BCRYPT_MAX_PASSWORD_BYTES].decode("utf-8", errors="ignore")
+    return password
+
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return pwd_context.hash(_truncate_password(password))
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(_truncate_password(plain_password), hashed_password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
