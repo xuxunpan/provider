@@ -18,12 +18,12 @@ async def get_current_user(
     payload = decode_access_token(credentials.credentials)
     if payload is None:
         from fastapi import HTTPException, status
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token 无效或已过期")
 
     user = await db.users.find_one({"_id": payload["sub"]})
     if not user:
         from fastapi import HTTPException, status
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="用户不存在")
 
     return {"id": str(user["_id"]), "email": user["email"]}
 

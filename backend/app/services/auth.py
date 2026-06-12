@@ -9,7 +9,7 @@ from .database import get_database
 async def register_user(db: AsyncIOMotorDatabase, data: UserRegister) -> dict:
     existing = await db.users.find_one({"email": data.email})
     if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="该邮箱已注册")
 
     user = UserModel(
         email=data.email,
@@ -29,10 +29,10 @@ async def register_user(db: AsyncIOMotorDatabase, data: UserRegister) -> dict:
 async def login_user(db: AsyncIOMotorDatabase, email: str, password: str) -> dict:
     user = await db.users.find_one({"email": email})
     if not user or not verify_password(password, user["hashed_password"]):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="邮箱或密码错误")
 
     if not user.get("is_active", True):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is disabled")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="账号已被禁用")
 
     token = create_access_token({"sub": str(user["_id"]), "email": user["email"]})
     return {

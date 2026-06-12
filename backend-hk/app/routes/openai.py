@@ -13,7 +13,7 @@ settings = get_settings()
 
 async def verify_api_key(x_api_key: str = Header(..., alias="X-API-Key")):
     if x_api_key != settings.INTERNAL_API_KEY:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="API Key 无效")
     return x_api_key
 
 
@@ -48,10 +48,10 @@ async def generate_image(
 
         mime_type = image.content_type or "image/png"
         if mime_type not in ("image/png", "image/jpeg", "image/webp", "image/gif"):
-            raise HTTPException(status_code=400, detail="Unsupported image format")
+            raise HTTPException(status_code=400, detail="不支持的图片格式")
 
         vision_response = await client.chat.completions.create(
-            model="gpt-4o",
+            model=settings.OPENAI_VISION_MODEL,
             messages=[
                 {
                     "role": "user",
@@ -84,7 +84,7 @@ async def generate_image(
 
     # Generate image with DALL-E 3
     response = await client.images.generate(
-        model="dall-e-3",
+        model=settings.OPENAI_IMAGE_MODEL,
         prompt=dalle_prompt[:4000],  # DALL-E prompt limit
         size="1024x1024",
         quality="standard",

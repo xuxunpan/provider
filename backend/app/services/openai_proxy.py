@@ -41,6 +41,6 @@ async def generate_image(
                 detail = response.json().get("detail", response.text)
             except Exception:
                 pass
-            raise HTTPException(status_code=response.status_code, detail=f"HK backend error: {detail}")
+            raise HTTPException(status_code=response.status_code, detail=f"HK 后端错误: {detail}")
 
         return response.json()
